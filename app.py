@@ -35,11 +35,11 @@ st.markdown("""
 def fetch_live_structure_data(chemical_name):
     """
     Queries the PubChem API dynamically using the chemical name.
-    Returns IUPAC name, SMILES, and a stable 2D PNG URL.
-    Includes a built-in safety fallback network switch.
+    Returns IUPAC name, SMILES (Checking both Canonical and Isomeric), and a stable 2D PNG URL.
     """
     clean_name = chemical_name.replace(" ", "%20")
-    api_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{clean_name}/property/IUPACName,CanonicalSMILES/JSON"
+    # We now ask the API for BOTH Canonical and Isomeric SMILES
+    api_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{clean_name}/property/IUPACName,CanonicalSMILES,IsomericSMILES/JSON"
     image_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{clean_name}/PNG?image_size=300x300"
     
     try:
@@ -47,15 +47,21 @@ def fetch_live_structure_data(chemical_name):
         if response.status_code == 200:
             data = response.json()
             properties = data['PropertyTable']['Properties'][0]
+            
+            # Smart fallback: Try Canonical first. If it's blank, grab Isomeric.
+            smiles = properties.get('CanonicalSMILES', properties.get('IsomericSMILES', 'N/A'))
+            
             return {
                 "success": True,
                 "iupac": properties.get('IUPACName', 'N/A'),
-                "smiles": properties.get('CanonicalSMILES', 'N/A'),
+                "smiles": smiles,
                 "image": image_url
             }
     except Exception:
         pass
+        
     return {"success": False, "image": image_url}
+
 
 # 3. Complete Master Database Matrix (20 Historical Plants)
 @st.cache_data
