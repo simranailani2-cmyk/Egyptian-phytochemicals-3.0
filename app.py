@@ -127,10 +127,14 @@ with col2:
     else:
         st.success(row['Safety'])
         
-    # THE 3D MOLECULAR WORKAROUND
+        # THE 3D MOLECULAR WORKAROUND
     st.markdown("<div class='section-banner'><h3>🔮 4. 3D Target Protein Receptor</h3></div>", unsafe_allow_html=True)
-    st.write(f"Live interactive 3D model of the **{row['PDB ID']}** binding target. Use your finger/mouse to rotate the crystal structure.")
-    st.components.v1.iframe(f"https://www.rcsb.org/3d-view/{row['PDB ID']}", height=450, scrolling=False)
+    st.write(f"Live interactive 3D model of the **{row['PDB ID']}** binding target. Use your finger to rotate the crystal structure.")
+    
+    # Using 3Dmol to strip away the website menus and only show the 3D protein
+    viewer_url = f"https://3dmol.csb.pitt.edu/viewer.html?pdb={row['PDB ID']}&style=cartoon&color=spectrum"
+    st.components.v1.iframe(viewer_url, height=450, scrolling=False)
+
 
 # ==========================================
 # 5. AUTOMATED SCREENING DOSSIER GENERATOR
