@@ -35,32 +35,48 @@ st.markdown("""
 def fetch_live_structure_data(chemical_name):
     """
     Queries the PubChem API dynamically using the chemical name.
-    Returns IUPAC name, SMILES (Checking both Canonical and Isomeric), and a stable 2D PNG URL.
+    Includes a secondary backup connection to the NIH Chemical Identifier Resolver 
+    if PubChem returns a blank SMILES string.
     """
     clean_name = chemical_name.replace(" ", "%20")
-    # We now ask the API for BOTH Canonical and Isomeric SMILES
-    api_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{clean_name}/property/IUPACName,CanonicalSMILES,IsomericSMILES/JSON"
+    pubchem_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{clean_name}/property/IUPACName,CanonicalSMILES,IsomericSMILES/JSON"
     image_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{clean_name}/PNG?image_size=300x300"
     
+    iupac = "N/A"
+    smiles = "N/A"
+    success = False
+    
     try:
-        response = requests.get(api_url, timeout=4)
+        # Step 1: Ask PubChem
+        response = requests.get(pubchem_url, timeout=4)
         if response.status_code == 200:
+            success = True
             data = response.json()
-            properties = data['PropertyTable']['Properties'][0]
+            properties = data.get('PropertyTable', {}).get('Properties', [{}])[0]
             
-            # Smart fallback: Try Canonical first. If it's blank, grab Isomeric.
-            smiles = properties.get('CanonicalSMILES', properties.get('IsomericSMILES', 'N/A'))
-            
-            return {
-                "success": True,
-                "iupac": properties.get('IUPACName', 'N/A'),
-                "smiles": smiles,
-                "image": image_url
-            }
+            iupac = properties.get('IUPACName', 'N/A')
+            # Look for Isomeric first, then Canonical. If both are blank, it remains "N/A"
+            smiles = properties.get('IsomericSMILES') or properties.get('CanonicalSMILES') or "N/A"
     except Exception:
         pass
-        
-    return {"success": False, "image": image_url}
+
+    # Step 2: The Backup Plan (If PubChem successfully connected but hid the SMILES)
+    if smiles == "N/A" or not smiles:
+        try:
+            cir_url = f"https://cir.nci.nih.gov/chemical/structure/{clean_name}/smiles"
+            cir_response = requests.get(cir_url, timeout=3)
+            if cir_response.status_code == 200:
+                smiles = cir_response.text.strip()
+        except Exception:
+            pass
+
+    return {
+        "success": success,
+        "iupac": iupac,
+        "smiles": smiles,
+        "image": image_url
+    }
+
 
 
 # 3. Complete Master Database Matrix (20 Historical Plants)
