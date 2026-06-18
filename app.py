@@ -153,7 +153,7 @@ with col2:
     
     # Ultra-lightweight viewer style (stick representation) to prevent mobile crashing
     viewer_url = f"https://3dmol.csb.pitt.edu/viewer.html?pdb={row['PDB ID']}&style=stick"
-    st.components.v1.iframe(viewer_url, height=450, scrolling=False)
+    st.components.v1.iframe(viewer_url, height=450, scrolling=True)
 
 
 
