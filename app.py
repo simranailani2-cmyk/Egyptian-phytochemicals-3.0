@@ -59,7 +59,7 @@ def load_kemet_database():
         "ID", "Botanical Name", "Family", "Common Name", "Egyptian Text", "Translation", 
         "Active Phytochemical", "PDB ID", "Binding Affinity", "Bonding Types", "Repulsion Forces", "Safety", "SMILES", "IUPAC"
     ]
-        return pd.DataFrame(raw_data, columns=headers)
+    return pd.DataFrame(raw_data, columns=headers)
 
 df = load_kemet_database()
 
