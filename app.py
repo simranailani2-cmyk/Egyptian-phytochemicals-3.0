@@ -140,20 +140,17 @@ with col2:
     st.success(f"🏆 **Best Binding Conformation:** Pose 1 exhibits the highest thermodynamic stability with ΔG = {affinity} kcal/mol and 0.00 Å deviation.")
     
     st.markdown("#### **Toxicological Safety Evaluation**")
-
-
     if "WARNING" in str(row['Safety']).upper() or "TOXIC" in str(row['Safety']).upper():
         st.error(row['Safety'])
     else:
         st.success(row['Safety'])
-        
-            # THE 3D MOLECULAR WORKAROUND
-    st.markdown("<div class='section-banner'><h3>🔮 4. 3D Target Protein Receptor</h3></div>", unsafe_allow_html=True)
-    st.write(f"Live interactive 3D model of the **{row['PDB ID']}** binding target. Use your finger to rotate the structure.")
-    
-    # Ultra-lightweight viewer style (stick representation) to prevent mobile crashing
-    viewer_url = f"https://3dmol.csb.pitt.edu/viewer.html?pdb={row['PDB ID']}&style=stick"
-    st.components.v1.iframe(viewer_url, height=450, scrolling=True)
+
+# Look, no indentation! This breaks it out of col2 and makes it full-screen width!
+st.markdown("<div class='section-banner'><h3>🔮 4. 3D Target Protein Receptor</h3></div>", unsafe_allow_html=True)
+st.write(f"Live interactive 3D model of the **{row['PDB ID']}** binding target. Use your finger/mouse to rotate the structure.")
+viewer_url = f"https://3dmol.csb.pitt.edu/viewer.html?pdb={row['PDB ID']}&style=stick"
+st.components.v1.iframe(viewer_url, height=450, scrolling=True)
+
 
 
 
