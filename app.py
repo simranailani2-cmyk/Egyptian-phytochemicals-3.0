@@ -130,7 +130,7 @@ with col2:
     """, unsafe_allow_html=True)
     
     st.markdown("#### **Docking Energy & Force Breakdown Matrix**")
-        st.write(f"**Identified Types of Intermolecular Bonding:** {row['Bonding Types']}")
+    st.write(f"**Identified Types of Intermolecular Bonding:** {row['Bonding Types']}")
     st.write(f"**Intermolecular Repulsion Forces Evaluation:** {row['Repulsion Forces']}")
     
     # NEW FEATURE: Conformational Pose Matrix
@@ -138,8 +138,9 @@ with col2:
     pose_df = generate_docking_poses(affinity)
     st.dataframe(pose_df, hide_index=True, use_container_width=True)
     st.success(f"🏆 **Best Binding Conformation:** Pose 1 exhibits the highest thermodynamic stability with ΔG = {affinity} kcal/mol and 0.00 Å deviation.")
-
+    
     st.markdown("#### **Toxicological Safety Evaluation**")
+
 
     if "WARNING" in str(row['Safety']).upper() or "TOXIC" in str(row['Safety']).upper():
         st.error(row['Safety'])
